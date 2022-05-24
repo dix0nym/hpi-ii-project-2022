@@ -183,6 +183,20 @@ To start the connector, you need to push the JSON config file to Kafka. You can 
 use the [bash script provided](./connect/push-config.sh). It is possible to remove a connector by deleting it
 through Kowl's UI dashboard or calling the deletion API in the [bash script provided](./connect/delete-config.sh).
 
+```json
+{
+  "connector.class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
+  "topics": "corporate-events",
+  "input.data.format": "PROTOBUF",
+  "connection.url": "http://elasticsearch:9200",
+  "type.name": "corporate-events",
+  "key.ignore": "false",
+  "schema.ignore": "true",
+  "tasks.max": "1",
+  "write.method": "UPSERT"
+}
+```
+
 ### GLEIF Crawler Usage
 
 You can start the crawler with the command below:
