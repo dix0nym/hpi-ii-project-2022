@@ -21,6 +21,9 @@ GLEIF is the Gloabl Legal Entity Identifier Foundation and they publish two data
 The Legal Entity Identifier (LEI) is a alphanumeric 20 digit code and is used for unique identification of legal entities involved in financial transactions.
 
 Both datasets are available via download from the website, they are compressed with zip. To use the crawler you have to download and extract it the dataset you want to parse.
+
+**Downlod the dataset** form [here](https://www.gleif.org/de/lei-data/gleif-concatenated-file/download-the-concatenated-file)
+
 The Crawler takes the plain xml file as an input, parse them by objects and produces messages to Kafka. For an usage example see [GLEIF Crawler](#gleif-crawler-usage).
 
 We use [Protocol buffers](https://developers.google.com/protocol-buffers) to define our schemas: [gleif](./proto/gleif/v1/gleif.proto), [relationship](./proto/gleif/v1/relationship.proto).
@@ -196,6 +199,8 @@ through Kowl's UI dashboard or calling the deletion API in the [bash script prov
   "write.method": "UPSERT"
 }
 ```
+
+Similar connector config for the other topics `gleif` and `gleif_relationships`.
 
 ### GLEIF Crawler Usage
 
