@@ -15,8 +15,10 @@ from gleif.v1.relationship_pb2 import RelationshipRecord
 log = logging.getLogger(__name__)
 
 class GleifReader:
-    def __init__(self):
-        self.producer = GleifProducer()
+    def __init__(self, recordType, path):
+        self.recordType = recordType
+        self.producer = GleifProducer(self.recordType)
+        self.path = path
     
     def getKey(self, record, path, default=None):
         try:
@@ -60,12 +62,6 @@ class GleifReader:
         message = Parse(json_data, LEIRecord(), ignore_unknown_fields=True)
         self.producer.produce_to_topic(message)
 
-    
-    def writeFile(self, name, lines):
-        with open(f"{name}.txt", 'w+') as f:
-            for line in lines:
-                f.write(f"{line}\n")
-
     def simplify(self, record, path):
         val = self.getKey(record, path)
         if not val:
@@ -99,20 +95,19 @@ class GleifReader:
         # simplify data structure
         self.simplify_all(relationship)
         self.clean_name(relationship, ['Relationship', 'RelationshipType'])
-        
+
         json_data = json.dumps(relationship)
         message = Parse(json_data, RelationshipRecord(), ignore_unknown_fields=True)
         self.producer.produce_to_topic(message)
     
-    def read(self, path, tag, callback=print):
-        doc = ET.iterparse(path, events=('end',))
+    def _read(self, tag, callback=print):
+        doc = ET.iterparse(self.path, events=('end',))
         for event, element in doc:
             if event == 'end' and self.get_tag(element) == tag:
                 callback(element)
                 element.clear()
 
-    def readLEI2(self, path):
-        self.read(path, 'LEIRecord', self.handle_record)
-
-    def readRR(self, path):
-        self.read(path, 'RelationshipRecord', self.handle_relationship)
+    def read(self):
+        callback = self.handle_record if self.recordType == 'lei' else self.handle_relationship
+        tag = 'LEIRecord' if self.recordType == 'lei' else 'RelationshipRecord'
+        self._read(tag, callback)

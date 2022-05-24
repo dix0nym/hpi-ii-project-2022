@@ -6,6 +6,7 @@ from confluent_kafka.schema_registry.protobuf import ProtobufSerializer
 from confluent_kafka.serialization import StringSerializer
 
 from gleif.v1 import gleif_pb2
+from gleif.v1 import relationship_pb2
 from gleif.v1.gleif_pb2 import LEIRecord
 from gleif.v1.relationship_pb2 import RelationshipRecord
 
@@ -17,13 +18,13 @@ TOPIC_RELATIONSHIPS: str = "gleif_relationships"
 log = logging.getLogger(__name__)
 
 class GleifProducer:
-    def __init__(self):
-        print('init GleifPRoducer')
+    def __init__(self, recordType):
         schema_registry_conf = {"url": SCHEMA_REGISTRY_URL}
         schema_registry_client = SchemaRegistryClient(schema_registry_conf)
 
+        schema = gleif_pb2.LEIRecord if recordType == 'lei' else relationship_pb2.RelationshipRecord
         protobuf_serializer = ProtobufSerializer(
-            gleif_pb2.LEIRecord, schema_registry_client, {"use.deprecated.format": True}
+            schema, schema_registry_client, {"use.deprecated.format": True}
         )
 
         producer_conf = {
@@ -38,9 +39,7 @@ class GleifProducer:
         key = None
         if isinstance(record, RelationshipRecord):
             topic = TOPIC_RELATIONSHIPS
-            key = f"{record.Relationship.StartNode.NodeID}_{record.Relationship.EndNode.NodeID}_\
-                    {record.Registration.RegistrationStatus}_{record.Relationship.RelationshipType}_\
-                    {record.Registration.InitialRegistrationDate.seconds}"
+            key = f"{record.Relationship.StartNode.NodeID}_{record.Relationship.EndNode.NodeID}_{record.Registration.RegistrationStatus}_{record.Relationship.RelationshipType}_{record.Registration.InitialRegistrationDate.seconds}"
         elif isinstance(record, LEIRecord):
             key = record.LEI
             topic = TOPIC_GLEIF
