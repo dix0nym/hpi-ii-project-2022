@@ -1,0 +1,60 @@
+syntax = "proto3";
+package gleif.v1;
+
+import "gleif/v1/registration.proto";
+import "gleif/v1/relationship.proto";
+
+message LEIRecord {
+    string id = 1;
+    string LEI = 2;
+    optional Entity Entity = 3;
+    Registration Registration = 4;
+}
+
+message Entity {
+    string LegalName = 1;
+    Address LegalAddress = 2;
+    Address HeadquartersAddress = 3;
+    RegistrationAuthority RegistrationAuthority = 4;
+    string LegalJurisdiction = 5;
+    EntityCategory EntityCategory = 6;
+    Status EntityStatus = 7;
+    string EntityCreationDate = 8;
+}
+
+enum EntityCategory {
+    FUND = 0;
+    BRANCH = 1;
+    GENERAL = 2;
+    SOLE_PROPRIETOR = 3;
+    RESIDENT_GOVERNMENT_ENTITY = 4;
+    INTERNATIONAL_ORGANIZATION = 5;
+}
+
+// enum Status {
+//     NULL = 0;
+//     INACTIVE = 1;
+//     ACTIVE = 2;
+// }
+
+
+
+message Address {
+    string FirstAddressLine = 1;
+    optional string AdditionalAddressLine = 2;
+    string City = 3;
+    string Region = 4;
+    string Country = 5;
+    optional string PostalCode = 6;
+}
+
+message RegistrationAuthority {
+    string RegistrationAuthorityID = 1;
+    string RegistrationAuthorityEntityID = 2;
+}
+
+message LegalForm {
+    uint32 EntityLegalFormCode = 1;
+    string OtherLegalForm = 2;
+}
+

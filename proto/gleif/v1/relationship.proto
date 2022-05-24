@@ -1,0 +1,92 @@
+syntax = "proto3";
+
+package gleif.v1;
+
+import "gleif/v1/registration.proto";
+import "google/protobuf/timestamp.proto";
+
+message RelationshipRecord {
+    string id = 1;
+    Relationship Relationship = 2;
+    Registration Registration = 3;
+}
+
+message Relationship {
+    Node StartNode = 1;
+    Node EndNode = 2;
+    RelationshipType RelationshipType = 3;
+    repeated RelationshipPeriod RelationshipPeriods = 4;
+    Status RelationshipStatus = 5;
+    repeated RelationshipQualifier RelationshipQualifiers = 6;
+}
+
+message Node {
+    string NodeID = 1;
+    string NodeIDType = 2;
+}
+
+message RelationshipPeriod {
+    google.protobuf.Timestamp StartDate = 1;
+    PeriodType PeriodType = 2;
+}
+
+message RelationshipQualifier {
+    enum QualifierDimension {
+            UNKOWN_DIMENSION = 0;
+            ACCOUNTING_STANDARD = 1;
+            TEST = 2;
+        }
+    QualifierCategory QualifierCategory = 2;
+}
+
+message RelationshipQuantifier {
+    MeasurementMethod MeasurementMethod = 1;
+    float QuantifierAmount = 2;
+    QuantifierUnits QuantifierUnits = 3;
+
+}
+
+
+enum QualifierCategory {
+    UNKOWN_CATEGORY = 0;
+    GOVERNMENT_ACCOUNTING_STANDARD = 1;
+    OTHER_ACCOUNTING_STANDARD = 2;
+    IFRS = 3;
+    US_GAAP = 4;
+    TEST = 5;
+}
+
+enum MeasurementMethod {
+    UNKOWN_METHOD = 0;
+    ACCOUNTING_CONSOLIDATION = 1;
+}
+
+enum QuantifierUnits {
+    UNKOWN = 0;
+    PERCENTAGE = 1;
+}
+
+enum PeriodType {
+    UNKOWN_PERIOD_TYPE = 0;
+    DOCUMENT_FILING_PERIOD = 1;
+    ACCOUNTING_PERIOD = 2;
+    RELATIONSHIP_PERIOD = 3;
+}
+
+enum RelationshipType {
+    UNKOWN_RELATIONSHIP_TYPE = 0;
+    IS_FEEDER_TO = 1;
+    IS_ULTIMATELY_CONSOLIDATED_BY = 2;
+    IS_INTERNATIONAL_BRANCH_OF = 3;
+    IS_SUBFUND_OF = 4;
+    IS_DIRECTLY_CONSOLIDATED_BY = 5;
+    IS_FUND_MANAGED_BY = 6;
+}
+
+enum Status {
+    NULL = 0;
+    INACTIVE = 1;
+    ACTIVE = 2;
+}
+
+

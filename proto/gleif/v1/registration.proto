@@ -1,0 +1,46 @@
+syntax = "proto3";
+package gleif.v1;
+
+import "google/protobuf/timestamp.proto";
+
+message Registration {
+    google.protobuf.Timestamp InitialRegistrationDate = 1;
+    google.protobuf.Timestamp LastUpdateDate = 2;
+    RegistrationStatus RegistrationStatus = 3;
+    google.protobuf.Timestamp NextRevewalDate = 4;
+    string ManagingLOU = 5;
+    ValidationSources ValidationSources = 6;
+    ValidationDocuments ValidationDocuments = 7;
+}
+
+message ValidationAuthority {
+    string ValidationAuthorityID = 1;
+    string ValidationAuthorityEntityID = 2; 
+}
+
+enum ValidationSources {
+    None = 0;
+    PARTIALLY_CORROBORATED = 1;
+    FULLY_CORROBORATED = 2;
+    ENTITY_SUPPLIED_ONLY = 3;
+}
+
+enum RegistrationStatus {
+    DUPLICATE = 0;
+    PENDING_TRANSFER = 1;
+    PENDING_ARCHIVAL = 2;
+    LAPSED = 3;
+    RETIRED = 4;
+    ANNULLED = 5;
+    ISSUED = 6;
+    PUBLISHED = 7;
+}
+
+enum ValidationDocuments {
+    UNKOWN_DOCUMENTS = 0;
+    OTHER_OFFICIAL_DOCUMENTS = 1;
+    CONTRACTS = 2;
+    SUPPORTING_DOCUMENTS = 3;
+    REGULATORY_FILING = 4;
+    ACCOUNTS_FILING = 5;    
+}
