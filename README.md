@@ -121,7 +121,7 @@ is complex and needs a schema definition.
 
 ### RB Parser 
 
-The crawler (rb_parser) ingests the messages in the corporate events topic and extracts information from the text. 
+The Parser (rb_parser) ingests the messages in the corporate events topic and extracts information from the text. 
 
 The parser uses a generated model class 'Company' from the [protobuf schema](./proto/parsed_hrb/v1/hrb.proto) for the resulting information.
 The parser subscribes to the messages in the corporate-events topic and deserializes them. Then the message is divided into parts and interesting information is extracted. This is a bit difficult because there are quite a lot of typos/missing spaces or accidental puncuation in the HRB data. 
