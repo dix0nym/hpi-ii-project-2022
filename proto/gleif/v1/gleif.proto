@@ -3,11 +3,12 @@ package gleif.v1;
 
 import "gleif/v1/registration.proto";
 import "gleif/v1/relationship.proto";
+import "google/protobuf/timestamp.proto";
 
 message LEIRecord {
     string id = 1;
     string LEI = 2;
-    optional Entity Entity = 3;
+    Entity Entity = 3;
     Registration Registration = 4;
 }
 
@@ -19,7 +20,7 @@ message Entity {
     string LegalJurisdiction = 5;
     EntityCategory EntityCategory = 6;
     Status EntityStatus = 7;
-    string EntityCreationDate = 8;
+    google.protobuf.Timestamp EntityCreationDate = 8;
 }
 
 enum EntityCategory {
@@ -31,21 +32,13 @@ enum EntityCategory {
     INTERNATIONAL_ORGANIZATION = 5;
 }
 
-// enum Status {
-//     NULL = 0;
-//     INACTIVE = 1;
-//     ACTIVE = 2;
-// }
-
-
-
 message Address {
     string FirstAddressLine = 1;
-    optional string AdditionalAddressLine = 2;
+    string AdditionalAddressLine = 2;
     string City = 3;
     string Region = 4;
     string Country = 5;
-    optional string PostalCode = 6;
+    string PostalCode = 6;
 }
 
 message RegistrationAuthority {
