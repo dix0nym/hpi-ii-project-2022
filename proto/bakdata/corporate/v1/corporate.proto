@@ -18,3 +18,33 @@ enum Status {
   STATUS_INACTIVE = 1;
   STATUS_ACTIVE = 2;
 }
+
+message Company {
+  string id = 1;
+  uint32 rb_id = 2;
+  string state = 3;
+  string reference_id = 4;
+  string event_date = 5;
+  string event_type = 6;
+  Status status = 7;
+  string name = 8; 
+  Address address = 9; 
+  string founding_date = 10; 
+  string company_objective = 11; 
+  string capital = 12; 
+  repeated CEO ceos = 13;
+  string info = 14;  
+}
+
+message CEO{
+    string title = 1; 
+    string name = 2; 
+    string birthdate = 3; 
+    bool company = 4;
+    string hrb_number = 5; 
+}
+message Address{
+  string city_name = 2; 
+  string plz = 3; 
+  string street = 4;
+}
