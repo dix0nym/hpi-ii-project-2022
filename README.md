@@ -119,6 +119,18 @@ key will look like this: `rp_56267`.
 The value of the message contains more information like `event_name`, `event_date`, and more. Therefore, the value type
 is complex and needs a schema definition.
 
+### RB Parser 
+
+The crawler (rb_parser) ingests the messages in the corporate events topic and extracts information from the text. 
+
+The parser uses a generated model class 'Company' from the [protobuf schema](./proto/parsed_hrb/v1/hrb.proto) for the resulting information.
+The parser subscribes to the messages in the corporate-events topic and deserializes them. Then the message is divided into parts and interesting information is extracted. This is a bit difficult because there are quite a lot of typos/missing spaces or accidental puncuation in the HRB data. 
+It then serializes the new Company object with the extracted data and produces it to the corporate-events-parsed topic. 
+
+### corporate-events-parsed topic
+The 'corporate-events-parsed' topic holds the extracted information from the HRB data. The key is the same as in the corporate-events topic. 
+It includes information about the address of a company and the name of the company. It also contains the date of the founding document, the company objective, the initial capital and information about executives. Executives in this case may also be other companies. 
+
 ### Kafka Connect
 
 [Kafka Connect](https://docs.confluent.io/platform/current/connect/index.html) is a tool to move large data sets into
