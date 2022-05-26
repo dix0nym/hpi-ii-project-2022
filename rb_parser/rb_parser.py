@@ -38,7 +38,7 @@ ceo_words = ['Geschäftsführer: ', 'director: ', 'Inhaber: ', 'Geschäftsführe
 def handle_neueintragung(msg):
     values = msg.value()
     entry = Company() 
-    entry.id = msg.key() + 'parsed'
+    entry.id = values.id
     entry.rb_id = values.rb_id 
     entry.state = values.state
     entry.reference_id = values.reference_id
