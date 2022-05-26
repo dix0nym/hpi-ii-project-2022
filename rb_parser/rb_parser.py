@@ -3,7 +3,10 @@ from confluent_kafka.schema_registry.protobuf import ProtobufDeserializer
 from confluent_kafka.serialization import StringDeserializer
 from confluent_kafka.schema_registry import SchemaRegistryClient
 from build.gen.bakdata.corporate.v1 import corporate_pb2
-from build.gen.bakdata.corporate.v1.corporate_pb2 import Corporate, Status, Company, Address, CEO
+from build.gen.bakdata.corporate.v1.corporate_pb2 import Corporate, Status
+from build.gen.parsed_hrb.v1 import hrb_pb2
+from build.gen.parsed_hrb.v1.hrb_pb2 import Company, CompanyStatus, Address, CEO
+
 import re
 from rb_producer import RbProducer
 import logging 
@@ -35,13 +38,13 @@ ceo_words = ['Geschäftsführer: ', 'director: ', 'Inhaber: ', 'Geschäftsführe
 def handle_neueintragung(msg):
     values = msg.value()
     entry = Company() 
-    entry.id = values.id
+    entry.id = msg.key() + 'parsed'
     entry.rb_id = values.rb_id 
     entry.state = values.state
     entry.reference_id = values.reference_id
     entry.event_date = values.event_date 
     entry.event_type = 'Neueintragungen'
-    entry.status = Status.STATUS_ACTIVE
+    entry.status = CompanyStatus.STATUS_ACTIVE
     info = values.information
     entry.info = info
 
@@ -496,7 +499,7 @@ def handle_update(msg):
     entry.reference_id = values.reference_id
     entry.event_date = values.event_date 
     entry.event_type = 'Veränderungen'
-    entry.status = Status.STATUS_ACTIVE
+    entry.status = CompanyStatus.STATUS_ACTIVE
     info = values.information
     entry.info = info
     
@@ -512,7 +515,7 @@ def handle_delete(msg):
     entry.reference_id = values.reference_id
     entry.event_date = values.event_date 
     entry.event_type = 'Löschungen'
-    entry.status = Status.STATUS_INACTIVE
+    entry.status = CompanyStatus.STATUS_INACTIVE
     info = values.information
     entry.info = info
     

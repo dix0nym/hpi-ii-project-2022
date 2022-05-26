@@ -5,8 +5,8 @@ from confluent_kafka.schema_registry import SchemaRegistryClient
 from confluent_kafka.schema_registry.protobuf import ProtobufSerializer
 from confluent_kafka.serialization import StringSerializer
 
-from build.gen.bakdata.corporate.v1 import corporate_pb2
-from build.gen.bakdata.corporate.v1.corporate_pb2 import Company
+from build.gen.parsed_hrb.v1 import hrb_pb2
+from build.gen.parsed_hrb.v1.hrb_pb2 import Company, CompanyStatus, Address, CEO
 
 log = logging.getLogger(__name__)
 
@@ -20,7 +20,7 @@ class RbProducer:
         schema_registry_client = SchemaRegistryClient(schema_registry_conf)
 
         protobuf_serializer = ProtobufSerializer(
-            corporate_pb2.Company, schema_registry_client, {"use.deprecated.format": True}
+            hrb_pb2.Company, schema_registry_client, {"use.deprecated.format": True}
         )
 
         producer_conf = {
