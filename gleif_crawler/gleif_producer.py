@@ -33,6 +33,7 @@ class GleifProducer:
             "value.serializer": protobuf_serializer,
         }
         self.producer = SerializingProducer(producer_conf)
+        self.buffer = 0
 
     def produce_to_topic(self, record):
         topic = None
@@ -48,7 +49,10 @@ class GleifProducer:
         self.producer.produce(
             topic=topic, partition=-1, key=str(key), value=record, on_delivery=self.delivery_report
         )
-        self.producer.poll()
+        self.buffer += 1
+        if self.buffer % 10000 == 0:
+            self.producer.poll()
+            self.producer.flush()
   
     @staticmethod
     def delivery_report(err, msg):
