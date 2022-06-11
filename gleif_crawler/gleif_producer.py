@@ -5,10 +5,10 @@ from confluent_kafka.schema_registry import SchemaRegistryClient
 from confluent_kafka.schema_registry.protobuf import ProtobufSerializer
 from confluent_kafka.serialization import StringSerializer
 
-from gleif.v1 import gleif_pb2
-from gleif.v1 import relationship_pb2
-from gleif.v1.gleif_pb2 import LEIRecord
-from gleif.v1.relationship_pb2 import RelationshipRecord
+from build.gen.gleif.v1 import gleif_pb2
+from build.gen.gleif.v1 import relationship_pb2
+from build.gen.gleif.v1.gleif_pb2 import LEIRecord
+from build.gen.gleif.v1.relationship_pb2 import RelationshipRecord
 
 BOOTSTRAP_SERVER: str = "localhost:29092"
 SCHEMA_REGISTRY_URL: str = "http://localhost:8081"

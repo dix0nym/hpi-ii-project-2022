@@ -8,9 +8,8 @@ import lxml.etree as ET
 import xmltodict
 from google.protobuf.json_format import Parse, ParseDict
 
-from gleif.v1 import gleif_pb2
-from gleif.v1.gleif_pb2 import LEIRecord
-from gleif.v1.relationship_pb2 import RelationshipRecord
+from build.gen.gleif.v1.gleif_pb2 import LEIRecord
+from build.gen.gleif.v1.relationship_pb2 import RelationshipRecord
 
 log = logging.getLogger(__name__)
 
