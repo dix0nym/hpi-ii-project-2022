@@ -105,6 +105,7 @@ class GleifReader:
             if event == 'end' and self.get_tag(element) == tag:
                 callback(element)
                 element.clear()
+        self.producer.poll()
 
     def read(self):
         callback = self.handle_record if self.recordType == 'lei' else self.handle_relationship

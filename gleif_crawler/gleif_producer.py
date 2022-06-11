@@ -51,9 +51,12 @@ class GleifProducer:
         )
         self.buffer += 1
         if self.buffer % 10000 == 0:
-            self.producer.poll()
-            self.producer.flush()
+            self.poll()
   
+    def poll(self):
+        self.producer.poll()
+        self.producer.flush()
+        
     @staticmethod
     def delivery_report(err, msg):
         """
