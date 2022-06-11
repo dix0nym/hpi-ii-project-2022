@@ -26,21 +26,23 @@ enum ValidationSources {
 }
 
 enum RegistrationStatus {
-    DUPLICATE = 0;
-    PENDING_TRANSFER = 1;
-    PENDING_ARCHIVAL = 2;
-    LAPSED = 3;
-    RETIRED = 4;
-    ANNULLED = 5;
-    ISSUED = 6;
-    PUBLISHED = 7;
+    NO_STATUS = 0;
+    DUPLICATE = 1;
+    PENDING_TRANSFER = 2;
+    PENDING_ARCHIVAL = 3;
+    LAPSED = 4;
+    RETIRED = 5;
+    ANNULLED = 6;
+    ISSUED = 7;
+    PUBLISHED = 8;
 }
 
 enum ValidationDocuments {
-    UNKOWN_DOCUMENTS = 0;
-    OTHER_OFFICIAL_DOCUMENTS = 1;
-    CONTRACTS = 2;
-    SUPPORTING_DOCUMENTS = 3;
-    REGULATORY_FILING = 4;
-    ACCOUNTS_FILING = 5;    
+    NO_DOCUMENTS = 0;
+    UNKOWN_DOCUMENTS = 1;
+    OTHER_OFFICIAL_DOCUMENTS = 2;
+    CONTRACTS = 3;
+    SUPPORTING_DOCUMENTS = 4;
+    REGULATORY_FILING = 5;
+    ACCOUNTS_FILING = 6;    
 }

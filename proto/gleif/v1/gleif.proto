@@ -24,12 +24,13 @@ message Entity {
 }
 
 enum EntityCategory {
-    FUND = 0;
-    BRANCH = 1;
-    GENERAL = 2;
-    SOLE_PROPRIETOR = 3;
-    RESIDENT_GOVERNMENT_ENTITY = 4;
-    INTERNATIONAL_ORGANIZATION = 5;
+    NONE = 0;
+    FUND = 1;
+    BRANCH = 2;
+    GENERAL = 3;
+    SOLE_PROPRIETOR = 4;
+    RESIDENT_GOVERNMENT_ENTITY = 5;
+    INTERNATIONAL_ORGANIZATION = 6;
 }
 
 message Address {
