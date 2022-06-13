@@ -88,7 +88,7 @@ class GleifReader:
     def handle_relationship(self, xml_relationship):
         relationship = xmltodict.parse(ET.tostring(xml_relationship), process_namespaces=True, namespaces={'http://www.gleif.org/data/schema/rr/2016': None})
         if not 'RelationshipRecord' in relationship:
-            print('early return')
+            log.info("key 'RelationshipRecord' not found in xml_relationship. Skipping.")
             return
         relationship = relationship['RelationshipRecord']
         # simplify data structure
