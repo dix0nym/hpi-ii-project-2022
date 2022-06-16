@@ -1,16 +1,16 @@
 {
-    "name": "Neo4jSinkConnector",
-    "config": {
-        "topics": "corporate-events-neo4j,gleif-neo4j,gleif_relationships",
-        "connector.class": "streams.kafka.connect.sink.Neo4jSinkConnector",
-        "errors.retry.timeout": "-1",
-        "errors.retry.delay.max.ms": "1000",
-        "errors.tolerance": "all",
-        "errors.log.enable": true,
-        "errors.log.include.messages": true,
-        "neo4j.server.uri": "bolt://neo4j:7687",
-        "neo4j.encryption.enabled": false,
-        "neo4j.topic.cypher.corporates": "Merge(c:Corporate{id:event.id}) SET c.name = event.name",
-        "neo4j.topic.cypher.persons": "Merge(p:Person{id: event.id}) SET p.first_name = event.first_name, p.role = event.role Merge(c:Corporate{id:event.corporate_id}) With p, c CALL apoc.merge.relationship(p, p.role,{}, {}, c) YIELD rel return rel"
-    }
+    "topics": "gleif2,gleif-relationships,CEO,company",
+    "connector.class": "streams.kafka.connect.sink.Neo4jSinkConnector",
+    "errors.tolerance": "all",
+    "errors.log.enable": true,
+    "errors.log.include.messages": true,
+    "neo4j.server.uri": "bolt://neo4j:7687",
+    "neo4j.encryption.enabled": false,
+    "neo4j.authentication.basic.username": "neo4j",
+    "neo4j.authentication.basic.password": "marina-quality-state-cosmos-jessica-4030",
+    "neo4j.topic.cypher.company": "Merge(c:Gleif2{hrb_id:event.reference_id}) SET c.company_objective = event.company_objective",
+    "neo4j.topic.cypher.CEO": "Merge(c:CEO{id: event.id}) SET c.firstname = event.firstname, c.lastname = event.lastname, c.birthplace = event.birthplace, c.birthdate = event.birthdate",
+    "neo4j.topic.cypher.gleif2": "Merge(g:Gleif2{id:event.LEI}) SET g.name = event.Entity.LegalName, g.hrb_id = event.RegistrationAuthorityEntity.RegistrationAuthorityEntityID",
+    "neo4j.topic.cypher.gleif-relationships": "Merge(r:GleifRelationships{id:event.id}) SET r.startNode = event.Relationship.StartNode.NodeID, r.endNode = event.Relationship.EndNode.NodeID, r.relationType = event.Relationship.RelationshipType Merge(g:Gleif2{id:r.startNode}) Merge(g2:Gleif2{id:r.endNode}) With r, g, g2 CALL apoc.merge.relationship(g, r.relationType, {}, {}, g2) YIELD rel return rel"
 }
+
