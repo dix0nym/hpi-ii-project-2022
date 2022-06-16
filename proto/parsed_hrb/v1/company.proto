@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package parsed_hrb.v1;
+
+enum CompanyStatus {
+  STATUS_UNSPECIFIED = 0;
+  STATUS_INACTIVE = 1;
+  STATUS_ACTIVE = 2;
+}
+
+message Company {
+  string id = 1;
+  uint32 rb_id = 2;
+  string state = 3;
+  string reference_id = 4;
+  string event_date = 5;
+  string event_type = 6;
+  CompanyStatus status = 7;
+  string name = 8; 
+  string founding_date = 9; 
+  string company_objective = 10; 
+  string capital = 11; 
+  repeated string ceos = 12;
+  repeated string address = 13;
+  repeated string owning_company = 14;
+}
