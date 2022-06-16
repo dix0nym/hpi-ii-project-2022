@@ -151,26 +151,23 @@ simple [protobuf schema](./proto/bakdata/corporate/v1/corporate.proto).
 Furthermore, you need to generate the Python code for the model class from the proto file.
 To do so run the [`generate-proto.sh`](./generate-proto.sh) script (**Important**: modify the script to have the correct include diretory - see below).
 This script uses the [Protobuf compiler (protoc)](https://grpc.io/docs/protoc-installation/) to generate the model class
-under the `build/gen/bakdata/corporate/v1` folder
-with the name `corporate_pb2.py`.
+under the `build/gen/bakdata/corporate/v1` folder with the name `corporate_pb2.py`.
 
-The Protobuf schema for gleif requires `google/protobuf/timestamp.proto` - so we had to include the `include` directory of Protobuf.
-You can find the protobuf `include` directory in the install directory of your Protobuf Installation. On Windows it's `protoc-3.20.1-win64\include\`.
+
+build protobuf files using following commands:
 
 ```shell
-protoc --proto_path=proto -I include/ --python_out=build/gen proto/gleif/v1/gleif.proto
-protoc --proto_path=proto -I include/ --python_out=build/gen proto/gleif/v1/relationship.proto
-protoc --proto_path=proto -I include/ --python_out=build/gen proto/gleif/v1/registration.proto
+protoc --proto_path=proto --python_out=build/gen proto/gleif/v1/gleif.proto
+protoc --proto_path=proto --python_out=build/gen proto/gleif/v1/relationship.proto
+protoc --proto_path=proto --python_out=build/gen proto/gleif/v1/registration.proto
 # or
-protoc --proto_path=proto -I include/ --python_out=build/gen proto/gleif/v1/*.proto
+protoc --proto_path=proto --python_out=build/gen proto/gleif/v1/*.proto
 ```
-
-The `-I include/` specifies the path to the protobuf includes.
 
 On Ubuntu we had to enable the experimental features of Protobuf Version 3.
 
 ```shell
-protoc --experimental_allow_proto3_optional --proto_path=proto -I include/ --python_out=build/gen proto/gleif/v1/*.proto
+protoc --experimental_allow_proto3_optional --proto_path=proto --python_out=build/gen proto/gleif/v1/*.proto
 ```
 
 ## Run

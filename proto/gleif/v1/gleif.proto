@@ -3,10 +3,8 @@ package gleif.v1;
 
 import "gleif/v1/registration.proto";
 import "gleif/v1/relationship.proto";
-import "google/protobuf/timestamp.proto";
 
 message LEIRecord {
-    string id = 1;
     string LEI = 2;
     Entity Entity = 3;
     Registration Registration = 4;
@@ -20,7 +18,7 @@ message Entity {
     string LegalJurisdiction = 5;
     EntityCategory EntityCategory = 6;
     Status EntityStatus = 7;
-    google.protobuf.Timestamp EntityCreationDate = 8;
+    string EntityCreationDate = 8;
 }
 
 enum EntityCategory {

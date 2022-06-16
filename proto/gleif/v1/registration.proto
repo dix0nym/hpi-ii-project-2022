@@ -1,13 +1,11 @@
 syntax = "proto3";
 package gleif.v1;
 
-import "google/protobuf/timestamp.proto";
-
 message Registration {
-    google.protobuf.Timestamp InitialRegistrationDate = 1;
-    google.protobuf.Timestamp LastUpdateDate = 2;
+    string InitialRegistrationDate = 1;
+    string LastUpdateDate = 2;
     RegistrationStatus RegistrationStatus = 3;
-    google.protobuf.Timestamp NextRevewalDate = 4;
+    string NextRevewalDate = 4;
     string ManagingLOU = 5;
     ValidationSources ValidationSources = 6;
     ValidationDocuments ValidationDocuments = 7;

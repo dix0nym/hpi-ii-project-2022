@@ -3,7 +3,6 @@ syntax = "proto3";
 package gleif.v1;
 
 import "gleif/v1/registration.proto";
-import "google/protobuf/timestamp.proto";
 
 message RelationshipRecord {
     string id = 1;
@@ -26,7 +25,7 @@ message Node {
 }
 
 message RelationshipPeriod {
-    google.protobuf.Timestamp StartDate = 1;
+    string StartDate = 1;
     PeriodType PeriodType = 2;
 }
 

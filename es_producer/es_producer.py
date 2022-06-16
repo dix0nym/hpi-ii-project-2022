@@ -20,9 +20,6 @@ def convert_item(obj):
     for k, v in obj.copy().items():
         if isinstance(v, dict):
             obj[k] = convert_item(v)
-        if "Date" in k and isinstance(obj[k], int):
-            dt = datetime.fromtimestamp(v/1000, tz=timezone.utc)
-            obj[k] = f"{dt.replace(tzinfo=None).isoformat()}Z"
         if re.match(pattern, k) and isinstance(v, dict):
             for k2, v2 in obj[k].items():
                 obj[k2] = v2
