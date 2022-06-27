@@ -302,6 +302,8 @@ class NeueintragungsParser():
                 name = parts[0].strip()
                 ort = parts[1].split('(')[0].strip() 
                 m2 = re.search('HRB.*?\)', company)
+                if not m2: 
+                    print(company)
                 hrb = company[m2.start():m2.end()-1]
                 self.results['company'].append((name, ort, hrb))
             else: 
