@@ -1,6 +1,7 @@
 import json
 import logging
 import operator
+import hashlib
 from functools import reduce
 
 from gleif_producer import GleifProducer
@@ -59,7 +60,7 @@ class GleifReader:
 
         json_data = json.dumps(record)
         message = Parse(json_data, LEIRecord(), ignore_unknown_fields=True)
-        self.producer.produce_to_topic(message)
+        self.producer.produce_to_topic(message, message.LEI)
 
     def simplify(self, record, path):
         val = self.getKey(record, path)
@@ -85,6 +86,11 @@ class GleifReader:
             return
         self.setKey(record, path, val.replace('-', '_'))
 
+    def getHashFromKey(self, key):
+        lib = hashlib.sha256()
+        lib.update(key.encode('utf-8'))
+        return lib.hexdigest()
+    
     def handle_relationship(self, xml_relationship):
         relationship = xmltodict.parse(ET.tostring(xml_relationship), process_namespaces=True, namespaces={'http://www.gleif.org/data/schema/rr/2016': None})
         if not 'RelationshipRecord' in relationship:
@@ -97,7 +103,7 @@ class GleifReader:
 
         json_data = json.dumps(relationship)
         message = Parse(json_data, RelationshipRecord(), ignore_unknown_fields=True)
-        self.producer.produce_to_topic(message)
+        self.producer.produce_to_topic(message, self.getHashFromKey(json_data))
     
     def _read(self, tag, callback=print):
         doc = ET.iterparse(self.path, events=('end',))

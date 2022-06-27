@@ -1,4 +1,5 @@
 import logging
+import hashlib
 
 from confluent_kafka import SerializingProducer
 from confluent_kafka.schema_registry import SchemaRegistryClient
@@ -35,17 +36,16 @@ class GleifProducer:
         self.producer = SerializingProducer(producer_conf)
         self.buffer = 0
 
-    def produce_to_topic(self, record):
+
+    def produce_to_topic(self, record, key):
         topic = None
-        key = None
         if isinstance(record, RelationshipRecord):
             topic = TOPIC_RELATIONSHIPS
-            key = f"{record.Relationship.StartNode.NodeID}_{record.Relationship.EndNode.NodeID}_{record.Registration.RegistrationStatus}_{record.Relationship.RelationshipType}_{record.Registration.InitialRegistrationDate.seconds}"
         elif isinstance(record, LEIRecord):
-            key = record.LEI
             topic = TOPIC_GLEIF
-        if not topic:
+        else:
             log.warning(f'Couldnt detect topic from message type {type(record)}')
+            return
         self.producer.produce(
             topic=topic, partition=-1, key=str(key), value=record, on_delivery=self.delivery_report
         )
