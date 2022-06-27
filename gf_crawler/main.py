@@ -2,7 +2,7 @@ import logging
 import os
 import sys
 
-from gleif_reader import GleifReader
+from gf_crawler.gf_reader import GfReader
 
 logging.basicConfig(
     level=os.environ.get("LOGLEVEL", "INFO"), format="%(asctime)s | %(name)s | %(levelname)s | %(message)s"
@@ -16,7 +16,7 @@ def run():
     recordType = args[0]
     path = args[1]
 
-    reader = GleifReader(recordType, path)
+    reader = GfReader(recordType, path)
 
     if recordType not in ['lei', 'rr']:
         exit('unkown recordType provided: {lei, rr}')

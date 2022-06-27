@@ -45,7 +45,6 @@ message RelationshipQuantifier {
 
 }
 
-
 enum QualifierCategory {
     UNKOWN_CATEGORY = 0;
     GOVERNMENT_ACCOUNTING_STANDARD = 1;

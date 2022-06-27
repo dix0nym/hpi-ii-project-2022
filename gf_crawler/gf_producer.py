@@ -1,5 +1,4 @@
 import logging
-import hashlib
 
 from confluent_kafka import SerializingProducer
 from confluent_kafka.schema_registry import SchemaRegistryClient
@@ -13,12 +12,12 @@ from build.gen.gleif.v1.relationship_pb2 import RelationshipRecord
 
 BOOTSTRAP_SERVER: str = "localhost:29092"
 SCHEMA_REGISTRY_URL: str = "http://localhost:8081"
-TOPIC_GLEIF: str = "gleif"
-TOPIC_RELATIONSHIPS: str = "gleif_relationships"
+TOPIC_GLEIF: str = "gf-lei"
+TOPIC_RELATIONSHIPS: str = "gf-relationship"
 
 log = logging.getLogger(__name__)
 
-class GleifProducer:
+class GfProducer:
     def __init__(self, recordType):
         schema_registry_conf = {"url": SCHEMA_REGISTRY_URL}
         schema_registry_client = SchemaRegistryClient(schema_registry_conf)

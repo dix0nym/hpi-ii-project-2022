@@ -4,7 +4,7 @@ import operator
 import hashlib
 from functools import reduce
 
-from gleif_producer import GleifProducer
+from gf_crawler.gf_producer import GfProducer
 import lxml.etree as ET
 import xmltodict
 from google.protobuf.json_format import Parse, ParseDict
@@ -14,10 +14,10 @@ from build.gen.gleif.v1.relationship_pb2 import RelationshipRecord
 
 log = logging.getLogger(__name__)
 
-class GleifReader:
+class GfReader:
     def __init__(self, recordType, path):
         self.recordType = recordType
-        self.producer = GleifProducer(self.recordType)
+        self.producer = GfProducer(self.recordType)
         self.path = path
     
     def getKey(self, record, path, default=None):
