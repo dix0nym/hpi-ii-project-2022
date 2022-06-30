@@ -4,11 +4,14 @@ from confluent_kafka.serialization import StringDeserializer
 from confluent_kafka.schema_registry import SchemaRegistryClient
 from build.gen.bakdata.corporate.v1 import corporate_pb2
 from build.gen.bakdata.corporate.v1.corporate_pb2 import Corporate, Status
-from build.gen.parsed_hrb.v1 import company_pb2, ceo_pb2, address_pb2, owning_company_pb2
+from build.gen.parsed_hrb.v1 import company_pb2, ceo_pb2, address_pb2, owning_company_pb2, owning_company_relation_pb2, address_relation_pb2, ceo_relation_pb2
 from build.gen.parsed_hrb.v1.company_pb2 import Company, CompanyStatus
 from build.gen.parsed_hrb.v1.ceo_pb2 import CEO
+from build.gen.parsed_hrb.v1.ceo_relation_pb2 import ceo_relation
 from build.gen.parsed_hrb.v1.address_pb2 import Address
-from build.gen.parsed_hrb.v1.owning_company_pb2 import owning_company
+from build.gen.parsed_hrb.v1.address_relation_pb2 import address_relation
+from build.gen.parsed_hrb.v1.owning_company_pb2 import Owning_company
+from build.gen.parsed_hrb.v1.owning_company_relation_pb2 import owning_company_relation
 
 import re
 from rb_producer import RbProducer
@@ -24,8 +27,11 @@ log = logging.getLogger(__name__)
 
 company_producer = RbProducer('company')
 address_producer = RbProducer('address')
+address_relation_producer = RbProducer('address_relation')
 ceo_producer = RbProducer('CEO')
+ceo_relation_producer = RbProducer('ceo_relation')
 owning_company_producer = RbProducer('owning_company')
+owning_company_relation_producer = RbProducer('owning_company_relation')
 
 def msg_process(msg):
     values = {} 
@@ -33,6 +39,7 @@ def msg_process(msg):
     info = msg.value().information
     if msg.value().event_type == 'create': 
         #if msg.value().state == 'bw': 
+        
         parser = NeueintragungsParser(info)
         results = parser.parse()
         company = Company()
@@ -46,18 +53,19 @@ def msg_process(msg):
             address_producer.produce_to_topic(addresse)
             company.address.append(addresse.id)
         for c in results['ceo']: 
-            lastname, firstname, birthplace, birthdate = c
+            lastname, firstname, middlename, birthplace, birthdate = c
             ceo = CEO()
             ceo.lastname = lastname
             ceo.firstname = firstname
+            ceo.middlename = middlename
             ceo.birthplace = birthplace 
             ceo.birthdate = birthdate
-            ceo.id = hashlib.sha1((lastname +  ';' + firstname + ';' + birthplace + ';' + birthdate).encode()).hexdigest()
+            ceo.id = hashlib.sha1((lastname +  ';' + firstname + ';' + middlename + ';'+ birthplace + ';' + birthdate).encode()).hexdigest()
             company.ceos.append(ceo.id)
             ceo_producer.produce_to_topic(ceo)
         for o in results['company']: 
             name, ort, hrb = o
-            owner = owning_company()
+            owner = Owning_company()
             owner.hrb = hrb
             owner.city = ort
             owner.name = name
@@ -72,7 +80,28 @@ def msg_process(msg):
         company.reference_id = msg.value().reference_id
         company.id = hashlib.sha1(company.reference_id.encode()).hexdigest()
         company_producer.produce_to_topic(company)
-        
+
+        for addr in company.address: 
+            ar = address_relation()
+            ar.company_id = company.id
+            ar.address_id = addr
+            ar.id = hashlib.sha1((addr + company.id).encode()).hexdigest()
+            address_relation_producer.produce_to_topic(ar)
+            
+        for owning_company in company.owning_company: 
+            ocr = owning_company_relation() 
+            ocr.company_id = company.id
+            ocr.owning_company_id = owning_company
+            ocr.id = hashlib.sha1((owning_company + company.id).encode()).hexdigest()
+            owning_company_relation_producer.produce_to_topic(ocr)
+            
+        for ceo in company.ceos: 
+            ceor = ceo_relation() 
+            ceor.company_id = company.id
+            ceor.ceo_id = ceo
+            ceor.id = hashlib.sha1((ceo + company.id).encode()).hexdigest()
+            ceo_relation_producer.produce_to_topic(ceor)
+            
 class NeueintragungsParser(): 
 
     def __init__(self, msg):
@@ -169,6 +198,11 @@ class NeueintragungsParser():
             if match and '$$$' not in self.msg[:match.start()]:
                 name = self.msg[:match.start()]
                 addresse = self.msg[match.start():match.end()]
+                m2 = re.search(',.*?$', name)
+                alt_ort = ''
+                if m2: 
+                    alt_ort = name[m2.start()+2:]
+                    name = name[:m2.start()]
                 self.msg = self.msg.replace(addresse, '$$$addresse$$$')
                 self.results['addresse'].append(addresse[1:-1])
                 self.msg = self.msg.replace(name, '$$$name$$$')
@@ -182,7 +216,7 @@ class NeueintragungsParser():
                 elif len(parts) == 2: 
                     strasse = parts[0]
                     ort = parts[1].strip()
-                elif len(parts) == 3: 
+                elif len(parts) >= 3: 
                     match = re.search('\d{5}', parts[1])
                     if match: 
                         ort = parts[1].strip()
@@ -200,6 +234,8 @@ class NeueintragungsParser():
                         extra = parts[0]
                         strasse = parts[1].strip()
                         ort = parts[2].strip()
+                if ort == '': 
+                    ort = alt_ort
                 self.results['parsed_addresse'].append((extra, strasse, ort))
                 
         if self.results['name'] == '': 
@@ -256,12 +292,21 @@ class NeueintragungsParser():
             if match: 
                 ceo = self.msg[match.start():match.end()]
                 self.msg = self.msg.replace(ceo, '$$$ceo$$$')
+                ceo = re.sub('\d\.', '', ceo)
                 parts = ceo.split(',')
-                lastname = parts[0].replace('1.', '').strip()
+                lastname = parts[0].strip()
+                m3 = re.search('.*\.', lastname)
+                if m3: 
+                    lastname = lastname[m3.end():].strip()
                 firstname = parts[1].strip()
+                middlename = '' 
+                m2 = re.search('\s', firstname)
+                if m2: 
+                    middlename = firstname[m2.end():].strip()
+                    firstname = firstname[:m2.start()].strip()
                 birthplace = parts[2].strip()
                 birthdate = parts[3][2:]
-                self.results['ceo'].append((lastname, firstname, birthplace, birthdate))
+                self.results['ceo'].append((lastname, firstname, middlename, birthplace, birthdate))
             else: 
                 break
         while True: 
@@ -269,12 +314,21 @@ class NeueintragungsParser():
             if match: 
                 ceo = self.msg[match.start():match.end()]
                 self.msg = self.msg.replace(ceo, '$$$ceo$$$')
+                ceo = re.sub('\d\.', '', ceo)
                 parts = ceo.split(',')
-                lastname = parts[0].replace('1.', '').strip()
+                lastname = parts[0].strip()
+                m3 = re.search('.*\.', lastname)
+                if m3: 
+                    lastname = lastname[m3.end():].strip()
                 firstname = parts[1].strip()
+                middlename = '' 
+                m2 = re.search('\s', firstname)
+                if m2: 
+                    middlename = firstname[m2.end():].strip()
+                    firstname = firstname[:m2.start()].strip()
                 birthplace = parts[3].strip()
                 birthdate = parts[2][2:]
-                self.results['ceo'].append((lastname, firstname, birthplace, birthdate))
+                self.results['ceo'].append((lastname, firstname, middlename, birthplace, birthdate))
             else: 
                 break
         while True: 
@@ -282,18 +336,27 @@ class NeueintragungsParser():
             if match: 
                 ceo = self.msg[match.start():match.end()]
                 self.msg = self.msg.replace(ceo, '$$$ceo$$$')
+                ceo = re.sub('\d\.', '', ceo)
                 parts = ceo.split(',')
-                lastname = parts[0].replace('1.', '').strip()
+                lastname = parts[0].strip()
+                m3 = re.search('.*\.', lastname)
+                if m3: 
+                    lastname = lastname[m3.end():].strip()
                 firstname = parts[1].strip()
+                middlename = '' 
+                m2 = re.search('\s', firstname)
+                if m2: 
+                    middlename = firstname[m2.end():].strip()
+                    firstname = firstname[:m2.start()].strip()
                 birthplace = ''
                 birthdate = parts[2][2:]
-                self.results['ceo'].append((lastname, firstname, birthplace, birthdate))
+                self.results['ceo'].append((lastname, firstname, middlename, birthplace, birthdate))
             else: 
                 break
-    
+        
     def parse_company_owner(self): 
         while True: 
-            match = re.search('[^:^\$^;]*?[A-Za-zäÄüÜöÖ],\s[A-Za-zäÄüÜöÖ]*\s\([^:^\$^;]*?HRB[^:^\$^;]*?\)', self.msg)
+            match = re.search('[^:^\$^;]*?[A-Za-zäÄüÜöÖ],\s[A-Za-zäÄüÜöÖ]*\s\([^:^\$^;]*?(?:HRB|HRA|PR|VR|GnR)[^:^\$^;]*?\)', self.msg)
             if match: 
                 company = self.msg[match.start():match.end()]
                 self.msg = self.msg.replace(company, '$$$company$$$')
@@ -301,7 +364,7 @@ class NeueintragungsParser():
                 parts = company.split(',')
                 name = parts[0].strip()
                 ort = parts[1].split('(')[0].strip() 
-                m2 = re.search('HRB.*?\)', company)
+                m2 = re.search('(?:HRB|HRA|PR|VR|GnR).*?\)', company)
                 if not m2: 
                     print(company)
                 hrb = company[m2.start():m2.end()-1]
@@ -311,6 +374,11 @@ class NeueintragungsParser():
         #if 'HRB' in self.msg: 
         #    print(self.msg)
         
+    def parse_nachschusspflicht(self): 
+        match = re.search('Nachschusspflicht:[^\$]*?\.', self.msg)
+        if match: 
+            self.msg = self.msg.replace(self.msg[match.start(),match.end()], '$$$nachschuss$$$')
+            
     def parse(self): 
         #if 'TREGAL' in self.msg: 
         #    print(self.msg)
@@ -320,6 +388,7 @@ class NeueintragungsParser():
         self.parse_nicht_eingetragen()
         self.parse_bemerkung()
         self.parse_kapital()
+        self.parse_nachschusspflicht()
         self.parse_rechtsform()
         self.parse_vertretung()
         self.parse_satzung()

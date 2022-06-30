@@ -5,11 +5,14 @@ from confluent_kafka.schema_registry import SchemaRegistryClient
 from confluent_kafka.schema_registry.protobuf import ProtobufSerializer
 from confluent_kafka.serialization import StringSerializer
 
-from build.gen.parsed_hrb.v1 import company_pb2, ceo_pb2, address_pb2, owning_company_pb2
+from build.gen.parsed_hrb.v1 import company_pb2, ceo_pb2, address_pb2, owning_company_pb2, owning_company_relation_pb2, address_relation_pb2, ceo_relation_pb2
 from build.gen.parsed_hrb.v1.company_pb2 import Company, CompanyStatus
 from build.gen.parsed_hrb.v1.ceo_pb2 import CEO
 from build.gen.parsed_hrb.v1.address_pb2 import Address
-from build.gen.parsed_hrb.v1.owning_company_pb2 import owning_company
+from build.gen.parsed_hrb.v1.owning_company_pb2 import Owning_company
+from build.gen.parsed_hrb.v1.owning_company_relation_pb2 import owning_company_relation
+from build.gen.parsed_hrb.v1.address_relation_pb2 import address_relation
+from build.gen.parsed_hrb.v1.ceo_relation_pb2 import ceo_relation
 
 log = logging.getLogger(__name__)
 
@@ -26,10 +29,16 @@ class RbProducer:
         if recordType == 'address': 
             schema = Address
         elif recordType == 'owning_company': 
-            schema = owning_company
+            schema = Owning_company
         elif recordType == 'CEO': 
             schema = CEO
-        
+        elif recordType == 'address_relation': 
+            schema = address_relation
+        elif recordType == 'ceo_relation': 
+            schema = ceo_relation
+        elif recordType == 'owning_company_relation': 
+            schema = owning_company_relation
+            
         self.topic = recordType
         
         protobuf_serializer = ProtobufSerializer(

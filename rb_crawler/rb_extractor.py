@@ -13,18 +13,21 @@ import datetime
 log = logging.getLogger(__name__)
 
 class RbExtractor:
-    def __init__(self, start_rb_id: int, state: str):
+    def __init__(self, start_rb_id: int, state: str, stop_rb_id :int):
         self.rb_id = start_rb_id
+        self.stop_rb_id = stop_rb_id
         self.state = state
         self.producer = RbProducer()
         self.fail_count = 0
         self.end_date = date.today()
         self.today = False
-        self.threshold = 10000
-        self.today_threshold = 1000
+        self.threshold = 2
+        self.today_threshold = 2
 	
     def extract(self):
         while True:
+            if self.rb_id > self.stop_rb_id: 
+                break
             try:
                 log.info(f"Sending Request for: {self.rb_id} and state: {self.state}")
                 text = self.send_request()
@@ -68,7 +71,7 @@ class RbExtractor:
     def send_request(self) -> str:
         url = f"https://www.handelsregisterbekanntmachungen.de/skripte/hrb.php?rb_id={self.rb_id}&land_abk={self.state}"
         # For graceful crawling! Remove this at your own risk!
-        sleep(0.5)
+        sleep(0.1)
         return requests.get(url=url).text
 
     @staticmethod

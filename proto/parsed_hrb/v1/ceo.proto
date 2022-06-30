@@ -5,7 +5,8 @@ package parsed_hrb.v1;
 message CEO {
   string id = 1; 
   string firstname = 2; 
-  string lastname = 3; 
-  string birthplace = 4; 
-  string birthdate = 5;
+  string middlename = 3;
+  string lastname = 4; 
+  string birthplace = 5; 
+  string birthdate = 6;
 }

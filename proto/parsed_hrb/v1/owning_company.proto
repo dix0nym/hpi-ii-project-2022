@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package parsed_hrb.v1;
 
-message owning_company {
+message Owning_company {
   string id = 1; 
   string hrb = 2; 
   string city = 3; 

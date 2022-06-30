@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package parsed_hrb.v1;
+
+message owning_company_relation {
+  string id = 1; 
+  string company_id = 2; 
+  string owning_company_id = 3; 
+}
