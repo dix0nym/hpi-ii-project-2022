@@ -377,7 +377,7 @@ class NeueintragungsParser():
     def parse_nachschusspflicht(self): 
         match = re.search('Nachschusspflicht:[^\$]*?\.', self.msg)
         if match: 
-            self.msg = self.msg.replace(self.msg[match.start(),match.end()], '$$$nachschuss$$$')
+            self.msg = self.msg.replace(self.msg[match.start():match.end()], '$$$nachschuss$$$')
             
     def parse(self): 
         #if 'TREGAL' in self.msg: 
