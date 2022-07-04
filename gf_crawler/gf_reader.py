@@ -69,8 +69,7 @@ class GfReader:
         self.fix_legalname(record)
         self.fix_address(record, ['Entity', 'HeadquartersAddress', 'AdditionalAddressLine'])
         self.fix_address(record, ['Entity', 'LegalAddress', 'AdditionalAddressLine'])
-        record['reference_id'] = self.create_reference_id(record)
-
+        record['ReferenceId'] = self.create_reference_id(record)
         json_data = json.dumps(record)
         message = Parse(json_data, LEIRecord(), ignore_unknown_fields=True)
         self.producer.produce_to_topic(message, message.LEI)
