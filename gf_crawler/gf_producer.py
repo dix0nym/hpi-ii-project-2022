@@ -5,9 +5,9 @@ from confluent_kafka.schema_registry import SchemaRegistryClient
 from confluent_kafka.schema_registry.protobuf import ProtobufSerializer
 from confluent_kafka.serialization import StringSerializer
 
-from build.gen.gleif.v1 import gleif_pb2
+from build.gen.gleif.v1 import lei_pb2
 from build.gen.gleif.v1 import relationship_pb2
-from build.gen.gleif.v1.gleif_pb2 import LEIRecord
+from build.gen.gleif.v1.lei_pb2 import LEIRecord
 from build.gen.gleif.v1.relationship_pb2 import RelationshipRecord
 
 BOOTSTRAP_SERVER: str = "localhost:29092"
@@ -22,7 +22,7 @@ class GfProducer:
         schema_registry_conf = {"url": SCHEMA_REGISTRY_URL}
         schema_registry_client = SchemaRegistryClient(schema_registry_conf)
 
-        schema = gleif_pb2.LEIRecord if recordType == 'lei' else relationship_pb2.RelationshipRecord
+        schema = lei_pb2.LEIRecord if recordType == 'lei' else relationship_pb2.RelationshipRecord
         protobuf_serializer = ProtobufSerializer(
             schema, schema_registry_client, {"use.deprecated.format": True}
         )

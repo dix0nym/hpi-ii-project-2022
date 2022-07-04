@@ -9,7 +9,7 @@ import lxml.etree as ET
 import xmltodict
 from google.protobuf.json_format import Parse, ParseDict
 
-from build.gen.gleif.v1.gleif_pb2 import LEIRecord
+from build.gen.gleif.v1.lei_pb2 import LEIRecord
 from build.gen.gleif.v1.relationship_pb2 import RelationshipRecord
 
 log = logging.getLogger(__name__)
@@ -70,7 +70,7 @@ class GfReader:
         self.fix_address(record, ['Entity', 'HeadquartersAddress', 'AdditionalAddressLine'])
         self.fix_address(record, ['Entity', 'LegalAddress', 'AdditionalAddressLine'])
         record['reference_id'] = self.create_reference_id(record)
-        
+
         json_data = json.dumps(record)
         message = Parse(json_data, LEIRecord(), ignore_unknown_fields=True)
         self.producer.produce_to_topic(message, message.LEI)
