@@ -1,0 +1,22 @@
+{
+    "name": "gleif-relationships-connector",
+    "config": {
+        "connector.class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
+        "type.name": "gf-relationship",
+        "tasks.max": "1",
+        "topics": "gf-relationship",
+        "name": "gleif-relationships-connector",
+        "write.method": "UPSERT",
+        "connection.url": "http://elasticsearch:9200",
+        "input.data.format": "PROTOBUF",
+        "key.ignore": "false",
+        "schema.ignore": "true"
+    },
+    "tasks": [
+        {
+            "connector": "gleif-relationships-connector",
+            "task": 0
+        }
+    ],
+    "type": "sink"
+}

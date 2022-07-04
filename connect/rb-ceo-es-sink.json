@@ -1,0 +1,22 @@
+{
+    "name": "rb-ceo-es-sink",
+    "config": {
+        "connector.class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
+        "type.name": "CEO",
+        "tasks.max": "1",
+        "topics": "CEO",
+        "name": "rb-ceo-es-sink",
+        "write.method": "UPSERT",
+        "connection.url": "http://elasticsearch:9200",
+        "input.data.format": "PROTOBUF",
+        "key.ignore": "false",
+        "schema.ignore": "true"
+    },
+    "tasks": [
+        {
+            "connector": "rb-ceo-es-sink",
+            "task": 0
+        }
+    ],
+    "type": "sink"
+}
