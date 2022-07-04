@@ -23,4 +23,5 @@ message Company {
   repeated string ceos = 12;
   repeated string address = 13;
   repeated string owning_company = 14;
+  string hrb = 15;
 }
