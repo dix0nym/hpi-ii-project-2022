@@ -77,7 +77,7 @@ def msg_process(msg):
         company.company_objective = results['gegenstand']
         company.capital = results['kapital']
         company.state = msg.value().state
-        company.reference_id = msg.value().reference_id
+        company.reference_id = msg.value().state + '/' + msg.value().reference_id
         company.id = hashlib.sha1(company.reference_id.encode()).hexdigest()
         company_producer.produce_to_topic(company)
 
