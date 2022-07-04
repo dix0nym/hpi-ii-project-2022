@@ -41,6 +41,18 @@ class GfReader:
             if isinstance(address, list):
                 self.setKey(record, path, "; ".join(address))
 
+    def create_reference_id(self, record):
+        hrb_id = self.getKey(record, ['Entity', 'RegistrationAuthority', 'RegistrationAuthorityEntityID'])
+        if not hrb_id:
+            return None
+        state = self.getKey(record, ['Entity', "LegalAddress", "Region"])
+        if not state:
+            return hrb_id
+        if '-' in state and state.startswith('DE-'):
+            state = state.split('-')[1]
+            return f"{state.lower()}/{hrb_id}"
+        return hrb_id
+        
     def fix_legalname(self, record):
         # hack to fix error in LegalName - xmltodict doesn't make a string from value because of attribute
         # "LegalName": {"@http://www.w3.org/XML/1998/namespace:lang": "en", "@xmlns": {"gleif": "http://www.gleif.org/concatenated-file/header-extension/2.0", "lei": "http://www.gleif.org/data/schema/leidata/2016"}, "#text": "AFRINVEST SECURITIES LIMITED"}
@@ -57,7 +69,8 @@ class GfReader:
         self.fix_legalname(record)
         self.fix_address(record, ['Entity', 'HeadquartersAddress', 'AdditionalAddressLine'])
         self.fix_address(record, ['Entity', 'LegalAddress', 'AdditionalAddressLine'])
-
+        record['reference_id'] = self.create_reference_id(record)
+        
         json_data = json.dumps(record)
         message = Parse(json_data, LEIRecord(), ignore_unknown_fields=True)
         self.producer.produce_to_topic(message, message.LEI)

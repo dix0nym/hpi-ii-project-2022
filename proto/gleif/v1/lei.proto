@@ -8,6 +8,7 @@ message LEIRecord {
     string LEI = 2;
     Entity Entity = 3;
     Registration Registration = 4;
+    string reference_id = 5;
 }
 
 message Entity {
