@@ -293,7 +293,7 @@ class NeueintragungsParser():
             if match: 
                 ceo = self.msg[match.start():match.end()]
                 self.msg = self.msg.replace(ceo, '$$$ceo$$$')
-                ceo = re.sub('\d\.', '', ceo)
+                ceo = re.sub('\d\.(?:^\d|$)', '', ceo)
                 parts = ceo.split(',')
                 lastname = parts[0].strip()
                 m3 = re.search('.*\.', lastname)
@@ -315,7 +315,7 @@ class NeueintragungsParser():
             if match: 
                 ceo = self.msg[match.start():match.end()]
                 self.msg = self.msg.replace(ceo, '$$$ceo$$$')
-                ceo = re.sub('\d\.', '', ceo)
+                ceo = re.sub('\d\.(?:^\d|$)', '', ceo)
                 parts = ceo.split(',')
                 lastname = parts[0].strip()
                 m3 = re.search('.*\.', lastname)
@@ -337,7 +337,7 @@ class NeueintragungsParser():
             if match: 
                 ceo = self.msg[match.start():match.end()]
                 self.msg = self.msg.replace(ceo, '$$$ceo$$$')
-                ceo = re.sub('\d\.', '', ceo)
+                ceo = re.sub('\d\.(?:^\d|$)', '', ceo)
                 parts = ceo.split(',')
                 lastname = parts[0].strip()
                 m3 = re.search('.*\.', lastname)
