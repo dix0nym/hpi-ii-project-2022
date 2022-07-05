@@ -12,6 +12,11 @@ from build.gen.parsed_hrb.v1 import company_pb2, ceo_relation_pb2, duplicate_ceo
 from build.gen.parsed_hrb.v1.duplicate_ceo_pb2 import duplicate_ceo
 from build.gen.parsed_hrb.v1.ceo_relation_pb2 import ceo_relation
 
+logging.basicConfig(
+        level=os.environ.get("LOGLEVEL", "INFO"), format="%(asctime)s | %(name)s | %(levelname)s | %(message)s"
+)
+
+
 log = logging.getLogger(__name__)
 
 def getHash(s):
@@ -34,7 +39,7 @@ class Deduplicator:
     def __init__(self, index):
         self.index = index
         self.es = ESLib(index)
-        self.producer = Producer('ceo_relation', ceo_relation)
+        self.producer = Producer('ceo_relation', ceo_relation, buffered=False)
         self.ceo_producer = Producer('duplicate_ceo', duplicate_ceo)
         self.duplicate_count = 0
 
@@ -74,7 +79,6 @@ class Deduplicator:
         conv_obj = convert_item(ceo['_source'])
         obj = ParseDict(conv_obj, duplicate_ceo(), ignore_unknown_fields=True)
         obj.original_id = original_id
-        # print(json.dumps(MessageToDict(obj), indent=4))
         log.info(f'archiving ceo {key} - replace by {original_id}')
         self.ceo_producer.produce(obj, key)
 
@@ -84,9 +88,8 @@ class Deduplicator:
         conv_obj = convert_item(relation['_source'])
         obj = ParseDict(conv_obj, ceo_relation(), ignore_unknown_fields=True)
         obj.ceo_id = ceo_id
-        # print(json.dumps(MessageToDict(obj), indent=4))
         log.info(f'updating relation {key} - replace {obj.ceo_id} with {ceo_id}')
-        #self.producer.produce(obj, key)
+        self.producer.produce(obj, key)
 
     def checkDuplicates(self, hits):
         names = {}
@@ -110,14 +113,9 @@ class Deduplicator:
                 log.info(f"found {len(relations)} relations for duplicate {dup['_source']['id']}")
                 all_relations.extend(relations)
                 for relation in relations:
-                    print(f"updating company {relation['_source']['company_id']}")
                     self.update_relation(relation, original['_source']['id'])
                 self.produce_ceo(dup, original['_source']['id'])
-            with open(f'{h}.json', 'w+') as f:
-                json.dump({'original': original, 'dups': duplicates[1:], 'relations': all_relations}, f, indent=4)
             self.duplicate_count += len(duplicates) - 1
-        #self.producer.poll()
-        self.ceo_producer.poll()
 
     
     def get_ceo_relations(self, ceo_id):
@@ -141,7 +139,6 @@ class Deduplicator:
 
 
     def search_key(self, key1, key2, size=10):
-        # print(f"search_key({key1}, {key2})")
         (status, page) = self.es.search({'bool':{'must':[{'term': {'birthdate': key1}}, {'term': {'firstname': key2}}]}}, size=size, sort=[{'_doc': 'desc'}])
         hits = page['hits']['hits']
         scroll_id = page['_scroll_id']
@@ -160,34 +157,28 @@ class Deduplicator:
         return all_hits
 
     def handleResults(self, buckets):
-        # print(f"handleResults({len(buckets)})")
         for bucket in buckets:
             doc_count = bucket['doc_count']
             if doc_count < 2:
                 continue
             key = bucket['key']['birthdate']
             ceos_firstnames = bucket['ceos_firstnames']['buckets']
-            print(f'found {doc_count} persons with {key}')
             for bucket2 in ceos_firstnames:
                 key2 = bucket2['key']
                 hits = self.search_key(key, key2)
-                print(hits)
+                log.info(f'found {len(hits)} entries with dob: {key} and firstname: {key2}')
                 self.checkDuplicates(hits)
 
     def start(self):
         after = None
-        i = 0
         while True:
             (status, page) = self.compositeAggregate(after=after)
-            with open(f'buckets-{i}.json', 'w+') as f:
-                json.dump(page, f, indent=4)
             ceos = page['aggregations']['ceos']
             self.handleResults(ceos['buckets'])
             if 'after_key' in ceos:
                 after = page['aggregations']['ceos']['after_key']
             else:
                 break
-            i += 1
         log.info(f'found {self.duplicate_count} duplicates')
 
               
