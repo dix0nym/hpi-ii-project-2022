@@ -109,6 +109,7 @@ class NeueintragungsParser():
         self.company = Company() 
         self.results = {'kapital':'', 'bemerkung':'', 'nicht_eingetragen':'', 'vertretung':'', 'rechtsform':'', 'satzung':'', 'register_id':'', 'addresse':[], 'sitz':'', 'firma':'', 'gegenstand':'', 'name':'', 'parsed_addresse' : [], 'ceo' : [], 'company':[], 'parsed_satzung':''}
         self.msg = msg 
+        self.msg = self.msg.replace('\n', '')
         
     def parse_kapital(self):
         start_words = [' Stamm- bzw. Grundkapital', ' Stammkapital', ' Grundkapital', ' Das Stammkapital beträgt', ' Stammkapital nun', ' Kapital', ';Stammkapital', 'Stammkapital', ' Haftungskapital']
@@ -367,7 +368,8 @@ class NeueintragungsParser():
                 ort = parts[1].split('(')[0].strip() 
                 m2 = re.search('(?:HRB|HRA|PR|VR|GnR).*?\)', company)
                 if not m2: 
-                    print(company)
+                    print('HRB parsing failed for :' + company)
+                    return
                 hrb = company[m2.start():m2.end()-1]
                 self.results['company'].append((name, ort, hrb))
             else: 
