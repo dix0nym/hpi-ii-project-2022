@@ -4,20 +4,18 @@ import operator
 import hashlib
 from functools import reduce
 
-from gf_crawler.gf_producer import GfProducer
 import lxml.etree as ET
 import xmltodict
 from google.protobuf.json_format import Parse, ParseDict
 
-from build.gen.gleif.v1.lei_pb2 import LEIRecord
-from build.gen.gleif.v1.relationship_pb2 import RelationshipRecord
+
 
 log = logging.getLogger(__name__)
 
 class GfReader:
-    def __init__(self, recordType, path):
-        self.recordType = recordType
-        self.producer = GfProducer(self.recordType)
+    def __init__(self, producer, schema, path):
+        self.producer = producer
+        self.schema = schema
         self.path = path
     
     def getKey(self, record, path, default=None):
@@ -71,8 +69,8 @@ class GfReader:
         self.fix_address(record, ['Entity', 'LegalAddress', 'AdditionalAddressLine'])
         record['ReferenceId'] = self.create_reference_id(record)
         json_data = json.dumps(record)
-        message = Parse(json_data, LEIRecord(), ignore_unknown_fields=True)
-        self.producer.produce_to_topic(message, message.LEI)
+        message = Parse(json_data, self.schema(), ignore_unknown_fields=True)
+        self.producer.produce(message, message.LEI)
 
     def simplify(self, record, path):
         val = self.getKey(record, path)
@@ -114,7 +112,7 @@ class GfReader:
         self.clean_name(relationship, ['Relationship', 'RelationshipType'])
 
         json_data = json.dumps(relationship)
-        message = Parse(json_data, RelationshipRecord(), ignore_unknown_fields=True)
+        message = Parse(json_data, self.schema(), ignore_unknown_fields=True)
         self.producer.produce_to_topic(message, self.getHashFromKey(json_data))
     
     def _read(self, tag, callback=print):
@@ -125,7 +123,8 @@ class GfReader:
                 element.clear()
         self.producer.poll()
 
-    def read(self):
-        callback = self.handle_record if self.recordType == 'lei' else self.handle_relationship
-        tag = 'LEIRecord' if self.recordType == 'lei' else 'RelationshipRecord'
-        self._read(tag, callback)
+    def readLEI(self):
+        self._read('LEIRecord', self.handle_record)
+
+    def readRR(self):
+        self._read('RelationshipRecord', self.handle_relationship)
