@@ -26,8 +26,8 @@ class ESLib:
     def deleteScroll(self, scroll_id):
         return self.deleteES("/_search/scroll", {'scroll_id': [scroll_id]})
     
-    def search(self, query, size=10):
-        data = {'size': size, 'query': query, 'sort': ["_doc"]}
+    def search(self, query, size=10, sort=["_doc"]):
+        data = {'size': size, 'query': query, 'sort': sort}
         return self._search(data)
 
     def _search(self, data):

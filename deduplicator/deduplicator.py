@@ -32,6 +32,7 @@ def convert_item(obj):
 
 class Deduplicator:
     def __init__(self, index):
+        self.index = index
         self.es = ESLib(index)
         self.producer = Producer('ceo_relation', ceo_relation)
         self.ceo_producer = Producer('duplicate_ceo', duplicate_ceo)
@@ -74,8 +75,8 @@ class Deduplicator:
         obj = ParseDict(conv_obj, duplicate_ceo(), ignore_unknown_fields=True)
         obj.original_id = original_id
         # print(json.dumps(MessageToDict(obj), indent=4))
-        log.info(f'archiving ceo {key} - replay by {original_id}')
-        #self.ceo_producer.produce(obj, key)
+        log.info(f'archiving ceo {key} - replace by {original_id}')
+        self.ceo_producer.produce(obj, key)
 
     
     def update_relation(self, relation, ceo_id):
@@ -116,7 +117,7 @@ class Deduplicator:
                 json.dump({'original': original, 'dups': duplicates[1:], 'relations': all_relations}, f, indent=4)
             self.duplicate_count += len(duplicates) - 1
         #self.producer.poll()
-        #self.ceo_producer.poll()
+        self.ceo_producer.poll()
 
     
     def get_ceo_relations(self, ceo_id):
