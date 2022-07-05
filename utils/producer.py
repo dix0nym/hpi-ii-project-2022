@@ -11,8 +11,9 @@ BOOTSTRAP_SERVER: str = "localhost:29092"
 SCHEMA_REGISTRY_URL: str = "http://localhost:8081"
 
 class Producer:
-    def __init__(self, topic, schema):
+    def __init__(self, topic, schema, buffered=False):
         self.schema = schema
+        self.buffered = buffered
 
         schema_registry_conf = {"url": SCHEMA_REGISTRY_URL}
         schema_registry_client = SchemaRegistryClient(schema_registry_conf)
@@ -35,8 +36,11 @@ class Producer:
             topic=self.topic, partition=-1, key=str(key), value=obj, on_delivery=self.delivery_report
         )
         self.buffer += 1
-        if self.buffer % 10000 == 0:
-            self.poll()
+        if self.buffered:
+            if self.buffer % 10000 == 0:
+                self.poll()
+        else:
+            self.producer.flush()
 
     def poll(self):
         self.producer.poll()
