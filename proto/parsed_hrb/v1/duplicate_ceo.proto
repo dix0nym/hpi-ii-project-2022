@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package parsed_hrb.v1;
+
+message duplicate_ceo {
+  string id = 1; 
+  string firstname = 2; 
+  string middlename = 3;
+  string lastname = 4; 
+  string birthplace = 5; 
+  string birthdate = 6;
+  string original_id = 7;
+}
