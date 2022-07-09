@@ -113,7 +113,7 @@ class GfReader:
 
         json_data = json.dumps(relationship)
         message = Parse(json_data, self.schema(), ignore_unknown_fields=True)
-        self.producer.produce_to_topic(message, self.getHashFromKey(json_data))
+        self.producer.produce(message, self.getHashFromKey(json_data))
     
     def _read(self, tag, callback=print):
         doc = ET.iterparse(self.path, events=('end',))
