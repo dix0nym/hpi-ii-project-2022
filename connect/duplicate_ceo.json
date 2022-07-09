@@ -1,0 +1,22 @@
+{
+    "name": "duplicate_ceo",
+    "config": {
+        "connector.class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
+        "type.name": "duplicate_ceo",
+        "tasks.max": "1",
+        "topics": "duplicate_ceo",
+        "name": "duplicate_ceo",
+        "write.method": "UPSERT",
+        "connection.url": "http://elasticsearch:9200",
+        "input.data.format": "PROTOBUF",
+        "key.ignore": "false",
+        "schema.ignore": "true"
+    },
+    "tasks": [
+        {
+            "connector": "duplicate_ceo",
+            "task": 0
+        }
+    ],
+    "type": "sink"
+}

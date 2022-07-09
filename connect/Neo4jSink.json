@@ -4,17 +4,20 @@
         "connector.class": "streams.kafka.connect.sink.Neo4jSinkConnector",
         "errors.log.include.messages": "true",
         "neo4j.authentication.basic.password": "marina-quality-state-cosmos-jessica-4030",
-        "topics": "gf-lei,gf-relationship,CEO,company",
+        "topics": "gf-lei,gf-relationship,CEO,company,ceo_relation,owning_company,owning_company_relation",
         "neo4j.server.uri": "bolt://neo4j:7687",
-        "neo4j.topic.cypher.CEO": "Merge(ceo:CEO{id: event.id}) SET ceo.firstname = event.firstname, ceo.lastname = event.lastname, ceo.birthplace = event.birthplace, ceo.birthdate = event.birthdate",
-        "neo4j.topic.cypher.gf-relationship": "Merge(r:GfRelationship{id:event.id}) SET r.startNode = event.Relationship.StartNode.NodeID, r.endNode = event.Relationship.EndNode.NodeID, r.relationType = event.Relationship.RelationshipType Merge(g:GfLei{id:r.startNode}) Merge(g2:GfLei{id:r.endNode}) With r, g, g2 CALL apoc.merge.relationship(g, r.relationType, {}, {}, g2) YIELD rel return rel",
-        "neo4j.topic.cypher.gf-lei": "Merge(g:GfLei{id:event.LEI}) SET g.name = event.Entity.LegalName, g.hrb_id = event.RegistrationAuthorityEntity.RegistrationAuthorityEntityID",
-        "neo4j.topic.cypher.company": "Merge(c:GfLei{hrb_id:event.reference_id}) SET c.company_objective = event.company_objective",
+        "neo4j.topic.cypher.CEO": "Merge(ceo:CEO{id: event.id}) SET ceo.firstname = event.firstname, ceo.middlename = event.middlename, ceo.lastname = event.lastname, ceo.birthplace = event.birthplace, ceo.birthdate = event.birthdate",
+        "neo4j.topic.cypher.gf-relationship": "Merge(r:GfRelationship{id:event.id}) SET r.startNode = event.Relationship.StartNode.NodeID, r.endNode = event.Relationship.EndNode.NodeID, r.relationType = event.Relationship.RelationshipType Merge(g:Company{lei:r.startNode}) Merge(g2:Company{lei:r.endNode}) With r, g, g2 CALL apoc.merge.relationship(g, r.relationType, {}, {}, g2) YIELD rel return rel",
+        "neo4j.topic.cypher.gf-lei": "Merge(g:Company{id:g.ReferenceId}) SET g.name = event.Entity.LegalName, g.lei = event.LEI",
+        "neo4j.topic.cypher.company": "Merge(c:Company{hrb_id:event.reference_id}) SET c.company_objective = event.company_objective, c.name = event.name, c.company_id = event.id, c.hrb = event.hrb",
         "name": "Neo4jSink",
         "neo4j.authentication.basic.username": "neo4j",
         "errors.tolerance": "all",
         "neo4j.encryption.enabled": "false",
-        "errors.log.enable": "true"
+        "errors.log.enable": "true",
+        "neo4j.topic.cypher.ceo_relation": "Merge(cr:CeoRelation{id:event.id}) SET cr.company_id = event.company_id, cr.ceo_id = event.ceo Merge(ceo:CEO{id: event.ceo_id}) Merge(c:Company{company_id:event.company_id}) With ceo, c CALL apoc.merge.relationship(ceo, 'is_ceo_of', {}, {}, c) YIELD rel return rel",
+        "neo4j.topic.cypher.owning_company": "Merge(oc:Company{hrb:event.hrb}) set oc.name = event.name",
+        "neo4j.topic.cypher.owning_company_relation": "Merge(c:Company{company_id:event.company_id}) Merge(c2:Company{company_id:event.owning_company_id}) With c, c2 CALL apoc.merge.relationship(c2, 'owns', {}, {}, c) YIELD rel return rel"
     },
     "tasks": [
         {
