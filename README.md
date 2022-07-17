@@ -246,7 +246,28 @@ through Kowl's UI dashboard or calling the deletion API in the [bash script prov
 }
 ```
 
-Similar connector config for the other topics `gleif` and `gleif_relationships`.
+See [connect](./connect/) for the configuration of all other connectors - including the [Neo4j-Connector](./connect/Neo4jSink.json):
+
+```json
+{
+  "connector.class": "streams.kafka.connect.sink.Neo4jSinkConnector",
+  "name": "Neo4jSink",
+  "neo4j.authentication.basic.username": "neo4j",
+  "errors.tolerance": "all",
+  "neo4j.encryption.enabled": "false",
+  "errors.log.enable": "true",
+  "errors.log.include.messages": "true",
+  "topics": "gf-lei,gf-relationship,CEO,company,ceo_relation,owning_company,owning_company_relation",
+  "neo4j.server.uri": "bolt://neo4j:7687",
+  "neo4j.topic.cypher.CEO": "Merge(ceo:CEO{id: event.id}) SET ceo.firstname = event.firstname, ceo.middlename = event.middlename, ceo.lastname = event.lastname, ceo.birthplace = event.birthplace, ceo.birthdate = event.birthdate",
+  "neo4j.topic.cypher.gf-relationship": "Merge(r:GfRelationship{id:event.id}) SET r.startNode = event.Relationship.StartNode.NodeID, r.endNode = event.Relationship.EndNode.NodeID, r.relationType = event.Relationship.RelationshipType Merge(g:Company{lei:r.startNode}) Merge(g2:Company{lei:r.endNode}) With r, g, g2 CALL apoc.merge.relationship(g, r.relationType, {}, {}, g2) YIELD rel return rel",
+  "neo4j.topic.cypher.gf-lei": "Merge(g:Company{id:g.ReferenceId}) SET g.name = event.Entity.LegalName, g.lei = event.LEI",
+  "neo4j.topic.cypher.company": "Merge(c:Company{hrb_id:event.reference_id}) SET c.company_objective = event.company_objective, c.name = event.name, c.company_id = event.id, c.hrb = event.hrb",
+  "neo4j.topic.cypher.ceo_relation": "Merge(cr:CeoRelation{id:event.id}) SET cr.company_id = event.company_id, cr.ceo_id = event.ceo Merge(ceo:CEO{id: event.ceo_id}) Merge(c:Company{company_id:event.company_id}) With ceo, c CALL apoc.merge.relationship(ceo, 'is_ceo_of', {}, {}, c) YIELD rel return rel",
+  "neo4j.topic.cypher.owning_company": "Merge(oc:Company{hrb:event.hrb}) set oc.name = event.name",
+  "neo4j.topic.cypher.owning_company_relation": "Merge(c:Company{company_id:event.company_id}) Merge(c2:Company{company_id:event.owning_company_id}) With c, c2 CALL apoc.merge.relationship(c2, 'owns', {}, {}, c) YIELD rel return rel"
+}
+```
 
 ### GLEIF Crawler Usage
 
@@ -321,6 +342,12 @@ curl -X GET "localhost:9200/_search?pretty" -H 'Content-Type: application/json' 
 ```
 "reference_id":"HRB 41865"
 ```
+
+### NeoDash Dashboard
+
+We are using the App [NeoDash](https://github.com/neo4j-labs/neodash) to visualize our data - you can easily load our dashboard configuration by using the [dashboard.json](./dashboard.json). You can easily install it in [Neo4j Desktop](https://neo4j.com/download/). 
+
+![dashboard](dashboard.png)
 
 ## Teardown
 You can stop and remove all the resources by running:

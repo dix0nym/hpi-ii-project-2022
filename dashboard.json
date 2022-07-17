@@ -1,0 +1,144 @@
+{
+  "title": "",
+  "version": "2.1",
+  "settings": {
+    "pagenumber": 0,
+    "editable": false,
+    "fullscreenEnabled": false,
+    "parameters": {
+      "neodash_company_name": null,
+      "neodash_company_id": null,
+      "neodash_company_company_id": "24080d74bc806630ecd148e8bb771bc4f094cc31",
+      "neodash_ceo_lastname": "Borcherdt"
+    },
+    "downloadImageEnabled": true
+  },
+  "pages": [
+    {
+      "title": "Main Page",
+      "reports": [
+        {
+          "title": "Overview",
+          "query": "MATCH (n)-[e]->(m) RETURN n,e,m LIMIT 20\n\n\n",
+          "width": 6,
+          "height": 2,
+          "x": 3,
+          "y": 0,
+          "type": "graph",
+          "selection": {
+            "CEO": "id",
+            "Company": "(label)"
+          },
+          "settings": {
+            "nodePositions": {}
+          }
+        },
+        {
+          "title": "CEOs with most Relationships",
+          "query": "MATCH(c:CEO)-[r]->(x)\nRETURN c.firstname, c.lastname, COUNT(r)\nORDER BY COUNT(r) DESC\nLIMIT 10\n\n\n",
+          "width": 3,
+          "height": 2,
+          "x": 9,
+          "y": 0,
+          "type": "table",
+          "selection": {},
+          "settings": {
+            "nodePositions": {}
+          }
+        },
+        {
+          "title": "Company owns Companies",
+          "query": "MATCH(c:Company)-[r]->(x:Company)\nRETURN c.company_id, COUNT(x)\nORDER BY COUNT(x) DESC\nLIMIT 10\n\n",
+          "width": 3,
+          "height": 2,
+          "x": 0,
+          "y": 2,
+          "type": "table",
+          "selection": {},
+          "settings": {
+            "nodePositions": {}
+          }
+        },
+        {
+          "title": "Companys of CEO",
+          "query": "MATCH(ceo:CEO{lastname:$neodash_ceo_lastname})-[r]-(x)\nreturn ceo,r,x\n\n\n",
+          "width": 3,
+          "height": 2,
+          "x": 9,
+          "y": 2,
+          "type": "graph",
+          "selection": {
+            "CEO": "id",
+            "Company": "name"
+          },
+          "settings": {
+            "nodePositions": {}
+          }
+        },
+        {
+          "title": "Relations of a Company",
+          "query": "MATCH(c:Company{company_id:$neodash_company_company_id})-[e]->(m)\nRETURN c,e,m\n\n\n",
+          "width": 3,
+          "height": 2,
+          "x": 3,
+          "y": 2,
+          "type": "graph",
+          "selection": {
+            "Company": "name"
+          },
+          "settings": {
+            "nodePositions": {}
+          }
+        },
+        {
+          "title": "CompanyId",
+          "query": "MATCH (n:`Company`) \nWHERE toLower(toString(n.`company_id`)) CONTAINS toLower($input) \nRETURN DISTINCT n.`company_id` as value LIMIT 5",
+          "width": 3,
+          "height": 1,
+          "x": 0,
+          "y": 0,
+          "type": "select",
+          "selection": {},
+          "settings": {
+            "type": "Node Property",
+            "entityType": "Company",
+            "propertyType": "company_id",
+            "parameterName": "neodash_company_company_id"
+          }
+        },
+        {
+          "title": "CEOs of a company",
+          "query": "MATCH(c:Company{company_id:$neodash_company_company_id})--(x:CEO)\nRETURN x\n\n\n",
+          "width": 3,
+          "height": 2,
+          "x": 6,
+          "y": 2,
+          "type": "graph",
+          "selection": {
+            "CEO": "lastname"
+          },
+          "settings": {
+            "nodePositions": {}
+          }
+        },
+        {
+          "title": "CEO",
+          "query": "MATCH (n:`CEO`) \nWHERE toLower(toString(n.`lastname`)) CONTAINS toLower($input) \nRETURN DISTINCT n.`lastname` as value LIMIT 5",
+          "width": 3,
+          "height": 1,
+          "x": 0,
+          "y": 1,
+          "type": "select",
+          "selection": {},
+          "settings": {
+            "type": "Node Property",
+            "entityType": "CEO",
+            "propertyType": "lastname",
+            "parameterName": "neodash_ceo_lastname"
+          }
+        }
+      ]
+    }
+  ],
+  "parameters": {}
+}
