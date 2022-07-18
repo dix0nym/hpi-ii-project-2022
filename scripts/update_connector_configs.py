@@ -13,6 +13,11 @@ for connector in connectors:
     request = requests.get(f"{connect_url}/{connector}")
     if request.ok:
         config = request.json()
+        # cleaning
+        if 'type' in config:
+            del config['type']
+        if 'tasks' in config:
+            del config['tasks']
         config_file = Path("connect", f"{connector}.json")
         with config_file.open('w+') as f:
             json.dump(config, f, indent=4)

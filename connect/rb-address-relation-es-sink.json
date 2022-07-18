@@ -1,22 +1,15 @@
 {
+  "name": "rb-address-relation-es-sink",
+  "config": {
+    "connector.class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
+    "type.name": "address_relation",
+    "tasks.max": "1",
+    "topics": "address_relation",
     "name": "rb-address-relation-es-sink",
-    "config": {
-        "connector.class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
-        "type.name": "address_relation",
-        "tasks.max": "1",
-        "topics": "address_relation",
-        "name": "rb-address-relation-es-sink",
-        "write.method": "UPSERT",
-        "connection.url": "http://elasticsearch:9200",
-        "input.data.format": "PROTOBUF",
-        "key.ignore": "false",
-        "schema.ignore": "true"
-    },
-    "tasks": [
-        {
-            "connector": "rb-address-relation-es-sink",
-            "task": 0
-        }
-    ],
-    "type": "sink"
+    "write.method": "UPSERT",
+    "connection.url": "http://elasticsearch:9200",
+    "input.data.format": "PROTOBUF",
+    "key.ignore": "false",
+    "schema.ignore": "true"
+  }
 }

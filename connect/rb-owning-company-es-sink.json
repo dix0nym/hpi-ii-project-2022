@@ -1,22 +1,15 @@
 {
+  "name": "rb-owning-company-es-sink",
+  "config": {
+    "connector.class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
+    "type.name": "owning_company",
+    "tasks.max": "1",
+    "topics": "owning_company",
     "name": "rb-owning-company-es-sink",
-    "config": {
-        "connector.class": "io.confluent.connect.elasticsearch.ElasticsearchSinkConnector",
-        "type.name": "owning_company",
-        "tasks.max": "1",
-        "topics": "owning_company",
-        "name": "rb-owning-company-es-sink",
-        "write.method": "UPSERT",
-        "connection.url": "http://elasticsearch:9200",
-        "input.data.format": "PROTOBUF",
-        "key.ignore": "false",
-        "schema.ignore": "true"
-    },
-    "tasks": [
-        {
-            "connector": "rb-owning-company-es-sink",
-            "task": 0
-        }
-    ],
-    "type": "sink"
+    "write.method": "UPSERT",
+    "connection.url": "http://elasticsearch:9200",
+    "input.data.format": "PROTOBUF",
+    "key.ignore": "false",
+    "schema.ignore": "true"
+  }
 }
